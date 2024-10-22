@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password  # Substitua pelo password desejado
+      MYSQL_DATABASE: my_database  # Nome do banco de dados que deseja criar
+      MYSQL_USER: user  # Usuário para acessar o banco
+      MYSQL_PASSWORD: user_password  # Senha do usuário
+    ports:
+      - "3306:3306"  # Expondo a porta do MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persistência de dados
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-container
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq_user  # Substitua pelo usuário desejado
+      RABBITMQ_DEFAULT_PASS: rabbitmq_password  # Senha para acessar o RabbitMQ
+    ports:
+      - "5672:5672"  # Porta para comunicação entre aplicações
+      - "15672:15672"  # Porta para acessar a interface de gerenciamento do RabbitMQ
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
