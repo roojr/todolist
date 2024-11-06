@@ -3,6 +3,7 @@ package br.com.projeto.todolist.user.controllers;
 import br.com.projeto.todolist.user.dtos.LoginDTO;
 import br.com.projeto.todolist.user.dtos.UserDTO;
 import br.com.projeto.todolist.user.services.UserService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/save")
+    @Transactional
     public ResponseEntity<?> saveUser(@RequestBody @Valid UserDTO userDTO){
         return userService.save(userDTO);
     }
