@@ -6,7 +6,7 @@ services:
     container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: root_password  # Substitua pelo password desejado
-      MYSQL_DATABASE: my_database  # Nome do banco de dados que deseja criar
+      MYSQL_DATABASE: todolist  # Nome do banco de dados que deseja criar
       MYSQL_USER: user  # Usuário para acessar o banco
       MYSQL_PASSWORD: user_password  # Senha do usuário
     ports:
