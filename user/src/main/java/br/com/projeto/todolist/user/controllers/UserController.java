@@ -22,6 +22,7 @@ public class UserController {
     public ResponseEntity<?> saveUser(@RequestBody @Valid UserDTO userDTO){
         return userService.save(userDTO);
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDTO loginDTO){
         return userService.login(loginDTO);

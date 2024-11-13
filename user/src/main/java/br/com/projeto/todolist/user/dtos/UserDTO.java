@@ -13,7 +13,7 @@ public record UserDTO(
         @NotBlank(message = "Please provide firtName") String firstName,
         @NotBlank(message = "Please provide lastName") String lastName,
         @NotNull(message = "Please provide birthDate") LocalDate birthDate,
-        @NotBlank(message = "Please provide lastName") String cpf) {
+        @NotBlank(message = "Please provide cpf") String cpf) {
 
     public static User fromUserDTO(UserDTO userDTO){
         User user = User.builder()
