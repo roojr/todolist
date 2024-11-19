@@ -32,9 +32,9 @@ public class UserService {
     TokenService tokenService;
 
     public ResponseEntity<Object> save(UserDTO userDTO) {
-        Optional<User> existingUser = userRepository.findUserByLogin(userDTO.login());
+        Optional<User> existingUser = userRepository.findUserByUsername(userDTO.username());
         if (existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Login already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
         }
 
         String passwordCripted = new BCryptPasswordEncoder().encode(userDTO.password());
@@ -46,7 +46,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> login(LoginDTO loginDTO) {
-        Optional<User> userDB = userRepository.findUserByLogin(loginDTO.login());
+        Optional<User> userDB = userRepository.findUserByUsername(loginDTO.username());
         if (userDB.isPresent()) {
             User user = userDB.get();
             var userPassword = new UsernamePasswordAuthenticationToken(user.getUsername(), loginDTO.password());
@@ -55,9 +55,9 @@ public class UserService {
                 TokenInfo token = tokenService.generateToken((User) authentication.getPrincipal());
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
             } catch (BadCredentialsException e) {
-                throw new BadCredentialsException("Invalid username or password");
+                throw new BadCredentialsException("Invalid credentials. Check the username and password.");
             }
         }
-        throw new BusinessException("Invalid username or password");
+        throw new BusinessException("Username not found");
     }
 }
