@@ -4,11 +4,10 @@ import br.com.projeto.todolist.user.models.User;
 
 public record UserResponseDTO(
         Long id,
-        String login,
-        String firsName,
-        String lastName) {
+        String username,
+        String email) {
 
     public static UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getLogin(), user.getFirstName(), user.getLastName());
+        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail());
     }
 }

@@ -24,14 +24,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String login;
+    private String username;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    private String email;
     @Column(nullable = false, name = "first_name")
     private String firstName;
     @Column(nullable = false, name = "last_name")
     private String lastName;
-    @Column(nullable = false, name = "birth_date")
+    @Column(name = "birth_date")
     private LocalDate birthDate;
     @Column(nullable = false, unique = true)
     private String cpf;
@@ -41,11 +43,6 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    @Override
-    public String getUsername() {
-        return this.login;
     }
 
     @Override

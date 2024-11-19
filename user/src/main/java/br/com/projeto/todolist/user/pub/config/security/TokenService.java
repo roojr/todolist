@@ -1,6 +1,7 @@
 package br.com.projeto.todolist.user.pub.config.security;
 
 import br.com.projeto.todolist.user.dtos.TokenInfo;
+import br.com.projeto.todolist.user.dtos.UserComponentDTO;
 import br.com.projeto.todolist.user.models.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
 
 @Service
 public class TokenService {
@@ -24,13 +26,14 @@ public class TokenService {
     public TokenInfo generateToken(User user) {
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
+            Instant expires = genExpirationDate();
             String token  = JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(user.getId().toString())
-                    .withExpiresAt(genExpirationDate())
+                    .withExpiresAt(expires)
                     .sign(algorithm);
 
-            return new TokenInfo(token);
+            return new TokenInfo(token, expires, UserComponentDTO.fromDTO(user));
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Error while generating token", exception);
         }
