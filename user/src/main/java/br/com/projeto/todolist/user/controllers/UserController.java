@@ -2,6 +2,7 @@ package br.com.projeto.todolist.user.controllers;
 
 import br.com.projeto.todolist.user.dtos.LoginDTO;
 import br.com.projeto.todolist.user.dtos.UserDTO;
+import br.com.projeto.todolist.user.repositories.UserRepository;
 import br.com.projeto.todolist.user.services.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -30,5 +31,11 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAllUser(){
         return ResponseEntity.status(HttpStatus.OK).body("Deu certo");
+    }
+
+    @DeleteMapping("/delete-user/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
+       return userService.delete(id);
     }
 }

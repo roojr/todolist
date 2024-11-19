@@ -60,4 +60,16 @@ public class UserService {
         }
         throw new BusinessException("Username not found");
     }
+
+    public ResponseEntity<?> delete(Long id) {
+        Optional<User> userDB = userRepository.findById(id);
+        if (userDB.isPresent()) {
+            User user = userDB.get();
+            user.setInActive(false);
+            userRepository.save(user);
+
+            return ResponseEntity.ok("User successfully deleted.");
+        }
+        throw new BusinessException("User not found.");
+    }
 }
