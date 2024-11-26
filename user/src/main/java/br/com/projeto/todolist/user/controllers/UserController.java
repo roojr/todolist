@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class UserController {
 
@@ -28,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUser(){
-        return ResponseEntity.status(HttpStatus.OK).body("Deu certo");
+    public ResponseEntity<List<?>> getAllUser(){
+        return userService.getAll();
     }
 }

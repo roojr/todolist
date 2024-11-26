@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,5 +60,11 @@ public class UserService {
             }
         }
         throw new BusinessException("Username not found");
+    }
+
+    public ResponseEntity<List<?>> getAll() {
+        List<User> userList = userRepository.findAll();
+        List<UserResponseDTO> responseDTOList = userList.stream().map(UserResponseDTO::toDTO).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
     }
 }
