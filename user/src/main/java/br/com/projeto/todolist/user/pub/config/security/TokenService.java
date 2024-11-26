@@ -8,20 +8,23 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 @Service
 public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
+
+    private final Map<String,Boolean> invalidatedTokens = new ConcurrentHashMap<>();
 
     public TokenInfo generateToken(User user) {
         try{
@@ -64,4 +67,11 @@ public class TokenService {
 
     private Instant genExpirationDate() { return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));}
 
+    public void invalidateToken(String token) {
+        invalidatedTokens.put(token, true);
+    }
+
+    public boolean isTokenInvalidated(String token) {
+        return invalidatedTokens.getOrDefault(token, false);
+    }
 }

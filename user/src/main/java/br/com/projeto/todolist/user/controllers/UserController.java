@@ -3,6 +3,7 @@ package br.com.projeto.todolist.user.controllers;
 import br.com.projeto.todolist.user.dtos.LoginDTO;
 import br.com.projeto.todolist.user.dtos.UserDTO;
 import br.com.projeto.todolist.user.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,10 @@ public class UserController {
     @PostMapping("auth/login")
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDTO loginDTO){
         return userService.login(loginDTO);
+    }
+    @PostMapping("/auth/logout")
+    public ResponseEntity<?> logoutUser(HttpServletRequest request){
+        return userService.logout(request);
     }
 
     @GetMapping
