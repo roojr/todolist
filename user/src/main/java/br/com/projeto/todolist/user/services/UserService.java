@@ -1,10 +1,7 @@
 package br.com.projeto.todolist.user.services;
 
 
-import br.com.projeto.todolist.user.dtos.LoginDTO;
-import br.com.projeto.todolist.user.dtos.TokenInfo;
-import br.com.projeto.todolist.user.dtos.UserDTO;
-import br.com.projeto.todolist.user.dtos.UserResponseDTO;
+import br.com.projeto.todolist.user.dtos.*;
 import br.com.projeto.todolist.user.models.User;
 import br.com.projeto.todolist.user.pub.config.security.TokenService;
 import br.com.projeto.todolist.user.pub.exception.BusinessException;
@@ -20,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -68,5 +66,31 @@ public class UserService {
             tokenService.invalidateToken(token);
         }
         return ResponseEntity.status(HttpStatus.OK).body("Logout successful");
+    }
+      
+    public ResponseEntity<?> update(long id, UserUpdtDTO userUpdtDTO) {
+        Optional<User> opUser = userRepository.findById(id);
+        if (opUser.isPresent()){
+            Optional<User> existingEmail = userRepository.findUserByEmail(userUpdtDTO.email());
+            if (existingEmail.isPresent() && !opUser.get().getEmail().equals(userUpdtDTO.email())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
+            }
+            Optional<User> existingUsername = userRepository.findUserByUsername(userUpdtDTO.username());
+            if (existingUsername.isPresent() && !opUser.get().getUsername().equals(userUpdtDTO.username())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+            }
+
+            User user = opUser.get();
+            userUpdtDTO.uptFromDto(user, userUpdtDTO);
+            userRepository.save(user);
+            return ResponseEntity.status(HttpStatus.OK).body(UserResponseDTO.toDTO(user));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid id, user not found");
+    }
+  
+    public ResponseEntity<List<?>> getAll() {
+        List<User> userList = userRepository.findAll();
+        List<UserResponseDTO> responseDTOList = userList.stream().map(UserResponseDTO::toDTO).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
     }
 }
