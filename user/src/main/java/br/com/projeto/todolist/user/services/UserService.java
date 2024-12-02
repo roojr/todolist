@@ -6,6 +6,7 @@ import br.com.projeto.todolist.user.models.User;
 import br.com.projeto.todolist.user.pub.config.security.TokenService;
 import br.com.projeto.todolist.user.pub.exception.BusinessException;
 import br.com.projeto.todolist.user.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,14 @@ public class UserService {
             }
         }
         throw new BusinessException("Username not found");
+    }
+
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = tokenService.recoverToken(request);
+        if(token != null) {
+            tokenService.invalidateToken(token);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Logout successful");
     }
       
     public ResponseEntity<?> update(long id, UserUpdtDTO userUpdtDTO) {
