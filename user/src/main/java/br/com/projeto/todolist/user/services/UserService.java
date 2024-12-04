@@ -92,35 +92,22 @@ public class UserService {
         }
 
         if(userFilterDTO.username() != null) {
-            List<Optional<User>> userDB = userRepository.findUsersByUsernameContainingIgnoreCase(userFilterDTO.username());
+            Optional<User> userDB = userRepository.findUserByUsername(userFilterDTO.username());
 
             if(userDB.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Username not found.");
             }
-
-            List<UserFilterDTO> responseUserDTO = userDB.stream()
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(UserFilterDTO::fromUserFilterDTO)
-                    .toList();
-
-            return ResponseEntity.status(HttpStatus.OK).body(responseUserDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(userDB);
         }
 
         if(userFilterDTO.email() != null) {
-            List<Optional<User>> userDB = userRepository.findUserByEmailContainingIgnoreCase(userFilterDTO.email());
+            Optional<User> userDB = userRepository.findUserByEmail(userFilterDTO.email());
 
             if(userDB.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail not found.");
             }
 
-            List<UserFilterDTO> responseUserDTO = userDB.stream()
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(UserFilterDTO::fromUserFilterDTO)
-                    .toList();
-
-            return ResponseEntity.status(HttpStatus.OK).body(responseUserDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(userDB);
         }
 
         if(userFilterDTO.cpf() != null) {
