@@ -6,6 +6,7 @@ import br.com.projeto.todolist.user.models.User;
 import br.com.projeto.todolist.user.pub.config.security.TokenService;
 import br.com.projeto.todolist.user.pub.exception.BusinessException;
 import br.com.projeto.todolist.user.repositories.UserRepository;
+import org.springframework.beans.BeanUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.CollectionUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -41,6 +44,7 @@ public class UserService {
         user.setPassword(passwordCripted);
         user.setInActive(Boolean.TRUE);
         userRepository.save(user);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toDTO(user));
     }
 
@@ -60,6 +64,61 @@ public class UserService {
         throw new BusinessException("Username not found");
     }
 
+    public ResponseEntity<?> delete(Long id) {
+        Optional<User> userDB = userRepository.findById(id);
+        if (userDB.isPresent()) {
+            User user = userDB.get();
+            user.setInActive(false);
+            userRepository.save(user);
+  
+          return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User successfully deleted.");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    }
+
+    public ResponseEntity<?> findUserByFilter(UserFilterDTO userFilterDTO) {
+        if(userFilterDTO.id() != null) {
+            Optional<User> userDB = userRepository.findById(userFilterDTO.id());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found.");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(UserFilterDTO.fromUserFilterDTO(userDB.get()));
+        }
+
+        if(userFilterDTO.username() != null) {
+            Optional<User> userDB = userRepository.findUserByUsername(userFilterDTO.username());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Username not found.");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(userDB);
+        }
+
+        if(userFilterDTO.email() != null) {
+            Optional<User> userDB = userRepository.findUserByEmail(userFilterDTO.email());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail not found.");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(userDB);
+        }
+
+        if(userFilterDTO.cpf() != null) {
+            Optional<User> userDB = userRepository.findUserByCpf(userFilterDTO.cpf());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CPF not found.");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(UserFilterDTO.fromUserFilterDTO(userDB.get()));
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    }
+      
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String token = tokenService.recoverToken(request);
         if(token != null) {

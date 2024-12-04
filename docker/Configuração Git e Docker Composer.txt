@@ -1,11 +1,65 @@
 git init
 --git add README.md
-git commit -m "first commit"
+git commit -m "commit inicial"
 git branch -M main
 git remote add origin https://github.com/roojr/todolist.git
 git push -u origin main
 
 
-Comando docker para gerar o container com os serviços rabbitMQ e mySql
+----------->>>>>>> Comando docker para gerar o container com os serviços rabbitMQ e mySql <------------------------
 docker-compose -f mysql-rabbitmq-docker-compose.yaml up -d
+
+----------->>>>>>> Comando docker para gerar o container com o serviço mySql <------------------------
+docker-compose -f mysql-docker-compose.yaml up -d
+
 Obs: Arquivo mysql-rabbitmq-docker-compose.yaml
+
+docker exec -it mysql-container mysql -u root -p
+
+mysql -u root -p
+MYSQL_ROOT_PASSWORD
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'root';
+CREATE USER 'roojr' IDENTIFIED TO 'roojr';
+CREATE DATABASE docker_mysql;
+USE docker_mysql;
+FLUSH PRIVILEGES;
+
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'root';
+
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+ 
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+ 
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+ 
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+ 
+### VS Code ###
+.vscode/
+ 
+ 
