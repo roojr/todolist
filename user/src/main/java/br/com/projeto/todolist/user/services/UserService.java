@@ -1,14 +1,12 @@
 package br.com.projeto.todolist.user.services;
 
 
-import br.com.projeto.todolist.user.dtos.LoginDTO;
-import br.com.projeto.todolist.user.dtos.TokenInfo;
-import br.com.projeto.todolist.user.dtos.UserDTO;
-import br.com.projeto.todolist.user.dtos.UserResponseDTO;
+import br.com.projeto.todolist.user.dtos.*;
 import br.com.projeto.todolist.user.models.User;
 import br.com.projeto.todolist.user.pub.config.security.TokenService;
 import br.com.projeto.todolist.user.pub.exception.BusinessException;
 import br.com.projeto.todolist.user.repositories.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +16,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -42,6 +44,10 @@ public class UserService {
         user.setPassword(passwordCripted);
         user.setInActive(Boolean.TRUE);
         userRepository.save(user);
+
+
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toDTO(user));
     }
 
@@ -70,6 +76,64 @@ public class UserService {
 
             return ResponseEntity.ok("User successfully deleted.");
         }
-        throw new BusinessException("User not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    }
+
+    public ResponseEntity<?> findUserByFilter(UserFilterDTO userFilterDTO) {
+
+        if(userFilterDTO.id() != null) {
+            Optional<User> userDB = userRepository.findById(userFilterDTO.id());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found.");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(UserFilterDTO.fromUserFilterDTO(userDB.get()));
+        }
+
+        if(userFilterDTO.username() != null) {
+            List<Optional<User>> userDB = userRepository.findUsersByUsernameContainingIgnoreCase(userFilterDTO.username());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Username not found.");
+            }
+
+            List<UserFilterDTO> responseUserDTO = userDB.stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(UserFilterDTO::fromUserFilterDTO)
+                    .toList();
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseUserDTO);
+        }
+
+        if(userFilterDTO.email() != null) {
+            List<Optional<User>> userDB = userRepository.findUserByEmailContainingIgnoreCase(userFilterDTO.email());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail not found.");
+            }
+
+            List<UserFilterDTO> responseUserDTO = userDB.stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(UserFilterDTO::fromUserFilterDTO)
+                    .toList();
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseUserDTO);
+        }
+
+        if(userFilterDTO.cpf() != null) {
+            Optional<User> userDB = userRepository.findUserByCpf(userFilterDTO.cpf());
+
+            if(userDB.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CPF not found.");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(UserFilterDTO.fromUserFilterDTO(userDB.get()));
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+
     }
 }
