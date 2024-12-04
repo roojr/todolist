@@ -31,7 +31,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = tokenService.recoverToken(request);
 
         try {
-            if(token != null){
+            if(token != null && !tokenService.isTokenInvalidated(token)) {
                 Long id = Long.parseLong(tokenService.validateToken(token));
                 UserDetails user = usuarioRepository.findUserById(id);
 
