@@ -3,6 +3,7 @@ package br.com.projeto.todolist.user.services;
 
 import br.com.projeto.todolist.user.dtos.*;
 import br.com.projeto.todolist.user.models.User;
+import br.com.projeto.todolist.user.producer.UserProducer;
 import br.com.projeto.todolist.user.pub.config.security.TokenService;
 import br.com.projeto.todolist.user.pub.exception.BusinessException;
 import br.com.projeto.todolist.user.repositories.UserRepository;
@@ -33,6 +34,12 @@ public class UserService {
     @Autowired
     TokenService tokenService;
 
+    final UserProducer userProducer;
+
+    public UserService(UserProducer userProducer) {
+        this.userProducer = userProducer;
+    }
+
     public ResponseEntity<Object> save(UserDTO userDTO) {
         Optional<User> existingUser = userRepository.findUserByUsername(userDTO.username());
         if (existingUser.isPresent()) {
@@ -44,6 +51,7 @@ public class UserService {
         user.setPassword(passwordCripted);
         user.setInActive(Boolean.TRUE);
         userRepository.save(user);
+        userProducer.publishMessageEmail(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toDTO(user));
     }
